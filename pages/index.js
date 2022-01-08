@@ -1,19 +1,16 @@
 import Head from 'next/head';
-import Image from 'next/image';
 import styles from '../styles/Home.module.css';
 import moment from 'moment';
 import { useForm } from 'react-hook-form';
-import DateAdapter from '@mui/lab/AdapterMoment';
-import LocalizationProvider from '@mui/lab/LocalizationProvider';
-import { DatePicker } from '@mui/lab';
-import TextField from '@material-ui/core/textfield';
 import { useState } from 'react';
 
 export default function Home() {
   const { register, handleSubmit } = useForm();
   const onSubmit = (data) => console.log(data);
-  const [startDate, setStartDate] = useState(moment().subtract(1, 'month'));
-  const [endDate, setEndDate] = useState(moment());
+  const [startDate, setStartDate] = useState(
+    moment().subtract(1, 'month').format('DD/MM/YYYY').toString()
+  );
+  const [endDate, setEndDate] = useState(moment().format('DD/MM/YYYY').toString());
   return (
     <div className={styles.container}>
       <Head>
@@ -33,29 +30,36 @@ export default function Home() {
             action="#"
             method="POST"
             onSubmit={handleSubmit(onSubmit)}
-            className="flex flex-col gap-y-10"
+            className="flex flex-col gap-y-10 text-3xl"
           >
-            <LocalizationProvider dateAdapter={DateAdapter}>
-              <DatePicker
-                fullWidth
-                label="Data iniziale"
-                value={startDate}
-                onChange={(newValue) => {
-                  setStartDate(newValue);
-                }}
-                renderInput={(params) => <TextField {...params} />}
-              />
-            </LocalizationProvider>
-            <LocalizationProvider dateAdapter={DateAdapter}>
-              <DatePicker
-                label="Data finale"
-                value={endDate}
-                onChange={(newValue) => {
-                  setEndDate(newValue);
-                }}
-                renderInput={(params) => <TextField {...params} />}
-              />
-            </LocalizationProvider>
+            <div className="flex flex-col gap-10">
+              <div className="flex flex-col gap-5">
+                <label>Data iniziale</label>
+                <input
+                  name="datepicker"
+                  datepicker
+                  type="text"
+                  className="bg-gray-50 border  sm:text-sm rounded-lg  block w-full pl-2.5 p-2.5 border-gray-600 placeholder-gray-400 text-black focus:ring-blue-500 focus:border-blue-500"
+                  placeholder={startDate}
+                  {...register('startDate', { required: true, maxLength: 10, minLength: 10 })}
+                />
+              </div>
+              <div className="flex flex-col gap-5">
+                <label>Data finale</label>
+                <input
+                  name="datepicker"
+                  datepicker
+                  type="text"
+                  className="bg-gray-50 border  sm:text-sm rounded-lg  block w-full pl-2.5 p-2.5 border-gray-600 placeholder-gray-400 text-black focus:ring-blue-500 focus:border-blue-500"
+                  placeholder={endDate}
+                  {...register('endDate')}
+                />
+              </div>
+            </div>
+            <input
+              type="submit"
+              className="border  sm:text-sm rounded-lg  block w-full pl-2.5 p-2.5 border-gray-600 placeholder-white text-gray-300 focus:ring-blue-500 focus:border-blue-500 bg-black"
+            />
           </form>
         </div>
       </main>
