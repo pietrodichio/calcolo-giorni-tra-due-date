@@ -3,22 +3,22 @@ import styles from '../styles/Home.module.css';
 import moment from 'moment';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { useForm } from 'react-hook-form';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import * as yup from 'yup';
+import { useRouter } from 'next/router';
 
 export default function Home() {
   const schema = yup
     .object({
-      name: yup.string().required('Company name is a required field'),
       startDate: yup
-        .string()
+        .string('ippo')
         .required('Deve esserci una data di inizio')
         .matches(
           /^([0-2][0-9]|(3)[0-1])(\/)(((0)[0-9])|((1)[0-2]))(\/)\d{4}$/,
           'La data deve essere nel formato dd/mm/yyyy'
         ),
       endDate: yup
-        .string()
+        .string('pippo')
         .required('Deve esserci una data di fine')
         .matches(
           /^([0-2][0-9]|(3)[0-1])(\/)(((0)[0-9])|((1)[0-2]))(\/)\d{4}$/,
@@ -35,11 +35,17 @@ export default function Home() {
     mode: 'onBlur',
     resolver: yupResolver(schema),
   });
-  const [startDate, setStartDate] = useState(
-    moment().subtract(1, 'month').format('DD/MM/YYYY').toString()
-  );
-  const [endDate, setEndDate] = useState(moment().format('DD/MM/YYYY').toString());
-  const onSubmit = (data) => console.log(data);
+
+  const router = useRouter();
+  const startDate = moment().subtract(1, 'month').format('DD/MM/YYYY').toString();
+  const endDate = moment().format('DD/MM/YYYY').toString();
+  const onSubmit = (data, errors) => {
+    router.push({
+      pathname: '/result',
+      query: { startDate: data.startDate, endDate: data.endDate },
+    });
+  };
+  // const onSubmit = (data, e) => console.log(data, e);
   return (
     <div className={styles.container}>
       <Head>
@@ -55,17 +61,12 @@ export default function Home() {
         <h1 className={styles.title}>Calcolo giorni tra due date</h1>
         <p className={styles.description}>Inserisci le date</p>
         <div className="flex flex-col w-full">
-          <form
-            action="#"
-            method="POST"
-            onSubmit={handleSubmit(onSubmit)}
-            className="flex flex-col gap-y-10 text-3xl"
-          >
+          <form className="flex flex-col gap-y-10 text-3xl" onSubmit={handleSubmit(onSubmit)}>
             <div className="flex flex-col gap-10">
               <div className="flex flex-col gap-5">
                 <label>Data iniziale</label>
                 <input
-                  name="datepicker"
+                  name="datainiziale"
                   type="text"
                   className="bg-gray-50 border  sm:text-sm rounded-lg  block w-full pl-2.5 p-2.5 border-gray-600 placeholder-gray-400 text-black focus:ring-blue-500 focus:border-blue-500"
                   placeholder={startDate}
@@ -78,8 +79,8 @@ export default function Home() {
               <div className="flex flex-col gap-5">
                 <label>Data finale</label>
                 <input
-                  name="datepicker"
-                  type="text"
+                  name="datafinale"
+                  type="text" //da usare con hookForm
                   className="bg-gray-50 border  sm:text-sm rounded-lg  block w-full pl-2.5 p-2.5 border-gray-600 placeholder-gray-400 text-black focus:ring-blue-500 focus:border-blue-500"
                   placeholder={endDate}
                   {...register('endDate')}
@@ -89,10 +90,13 @@ export default function Home() {
                 )}
               </div>
             </div>
-            <input
+            <button
+              // onClick={handleSubmit(onSubmit)}
               type="submit"
               className="border  sm:text-sm rounded-lg  block w-full pl-2.5 p-2.5 border-gray-600 placeholder-white text-gray-300 focus:ring-blue-500 focus:border-blue-500 bg-black"
-            />
+            >
+              Invia
+            </button>
           </form>
         </div>
       </main>
